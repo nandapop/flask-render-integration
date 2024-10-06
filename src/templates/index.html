@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Country and City</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <form action="/predict" method="POST">
+        <label for="country">Select Country:</label>
+        <select id="country" name="country" required>
+            <option value="">Select Country</option>
+        </select>
+
+        <label for="city">Select City:</label>
+        <select id="city" name="city" required>
+            <option value="">Select City</option>
+        </select>
+
+        <button type="submit">Predict AQI</button>
+    </form>
+
+    <script>
+      $(document).ready(function() {
+          $.getJSON('/get_locations', function(data) {
+              $.each(data, function(country, cities) {
+                  $('#country').append($('<option>', { value: country, text: country }));
+              });
+          });
+
+          $('#country').change(function() {
+              var selectedCountry = $(this).val();
+              $('#city').empty();
+              $('#city').append($('<option>', { value: "", text: "Select City" }));
+
+              if (selectedCountry) {
+                  $.getJSON('/get_locations', function(data) {
+                      var cities = data[selectedCountry];
+                      $.each(cities, function(index, city) {
+                          $('#city').append($('<option>', { value: city, text: city }));
+                      });
+                  });
+              }
+          });
+      });
+  </script>
+</body>
+</html>
